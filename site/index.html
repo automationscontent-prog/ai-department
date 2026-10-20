@@ -1,0 +1,976 @@
+<title>AI Department</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a quiet marketing site and a tabbed app in one page. White space does the work; one calm blue, one green for "runs in your office". */
+:root{
+  --bg:#FFFFFF; --bg-2:#F6F7F9; --surface:#FFFFFF; --line:#E7E9EE; --line-2:#D9DCE3;
+  --fg:#0E1116; --fg-2:#3B414D; --muted:#687083; --faint:#9AA0AD;
+  --accent:#2D5BE3; --accent-ink:#FFFFFF; --accent-soft:#EEF2FD; --accent-line:#C9D5FA;
+  --local:#17804F; --local-soft:#EAF6EF; --local-line:#BFE3CF;
+  --amber:#A86A12; --amber-soft:#FBF3E4;
+  --shadow:0 1px 2px rgba(14,17,22,.04),0 8px 24px rgba(14,17,22,.06);
+  --shadow-lg:0 2px 6px rgba(14,17,22,.04),0 24px 60px rgba(14,17,22,.10);
+  --f-sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --r:12px; --r-lg:18px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B0C0F; --bg-2:#101216; --surface:#14161B; --line:#22252D; --line-2:#2E323C;
+  --fg:#EEF0F4; --fg-2:#C7CBD4; --muted:#8C93A3; --faint:#5F6675;
+  --accent:#7D95FF; --accent-ink:#0B0C0F; --accent-soft:#171E36; --accent-line:#2E3A66;
+  --local:#4CC38A; --local-soft:#11241A; --local-line:#24533A;
+  --amber:#E2A647; --amber-soft:#2A2113;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+  --shadow-lg:0 2px 6px rgba(0,0,0,.3),0 24px 60px rgba(0,0,0,.5);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B0C0F; --bg-2:#101216; --surface:#14161B; --line:#22252D; --line-2:#2E323C;
+  --fg:#EEF0F4; --fg-2:#C7CBD4; --muted:#8C93A3; --faint:#5F6675;
+  --accent:#7D95FF; --accent-ink:#0B0C0F; --accent-soft:#171E36; --accent-line:#2E3A66;
+  --local:#4CC38A; --local-soft:#11241A; --local-line:#24533A;
+  --amber:#E2A647; --amber-soft:#2A2113;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+  --shadow-lg:0 2px 6px rgba(0,0,0,.3),0 24px 60px rgba(0,0,0,.5);
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font:400 16px/1.55 var(--f-sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+h1,h2,h3,h4{margin:0;font-weight:600;letter-spacing:-.022em;text-wrap:balance}
+p{margin:0}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+input,textarea{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.mono{font-family:var(--f-mono)}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.ic{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mark{display:inline-flex;align-items:center;gap:10px;font:600 16px/1 var(--f-sans);letter-spacing:-.01em;color:var(--fg)}
+.mark svg{width:24px;height:24px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 18px;border-radius:11px;background:var(--fg);color:var(--bg);font:500 15px/1 var(--f-sans);white-space:nowrap;transition:transform .15s ease,opacity .15s ease}
+.btn:hover{opacity:.88}
+.btn:active{transform:scale(.98)}
+.btn.blue{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line-2)}
+.btn.ghost:hover{background:var(--bg-2);opacity:1}
+.btn.sm{height:36px;padding:0 14px;font-size:14px;border-radius:9px}
+.btn[disabled]{opacity:.35;cursor:default}
+.tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:7px;font:500 12px/1 var(--f-mono);white-space:nowrap;border:1px solid var(--line);color:var(--muted);background:var(--bg-2)}
+.tag .ic{width:13px;height:13px}
+.tag.local{color:var(--local);background:var(--local-soft);border-color:var(--local-line)}
+.tag.cloud{color:var(--accent);background:var(--accent-soft);border-color:var(--accent-line)}
+.tag.high{color:var(--local);background:var(--local-soft);border-color:var(--local-line)}
+.tag.medium{color:var(--amber);background:var(--amber-soft);border-color:transparent}
+.eyebrow{font:500 12px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------------- landing ---------------- */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid transparent}
+.nav.scrolled{border-bottom-color:var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:28px;height:64px}
+.nav .links{display:flex;gap:24px;font-size:14px;color:var(--muted)}
+.nav .links a:hover{color:var(--fg)}
+.nav .sp{flex:1}
+.hero{padding-block:72px 40px;text-align:left}
+.hero .wrap{display:flex;flex-direction:column;align-items:flex-start}
+.hero h1{font-size:clamp(40px,6.4vw,72px);line-height:1.02;letter-spacing:-.045em;max-width:12ch;margin-top:18px}
+.hero .lead{font-size:clamp(17px,2vw,20px);line-height:1.5;color:var(--fg-2);max-width:34em;margin-top:22px}
+.hero .ctas{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.hero .note{font-size:13px;color:var(--muted);margin-top:14px}
+.pill{display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px;border-radius:999px;border:1px solid var(--line);font:500 13px/1 var(--f-sans);color:var(--fg-2);background:var(--bg)}
+.pill i{width:6px;height:6px;border-radius:50%;background:var(--local)}
+.showcase{padding-block:8px 24px}
+.window{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);box-shadow:var(--shadow-lg);overflow:hidden}
+.window .chrome{display:flex;align-items:center;gap:16px;height:52px;padding:0 16px;border-bottom:1px solid var(--line)}
+.dots{display:flex;gap:7px}.dots i{width:11px;height:11px;border-radius:50%;background:var(--line-2)}
+.window .body{position:relative;height:560px;overflow:hidden}
+.window .body::after{content:"";position:absolute;left:0;right:0;bottom:0;height:72px;background:linear-gradient(to bottom,transparent,var(--surface));pointer-events:none}
+.window .exnote{font:400 12px/1 var(--f-mono);color:var(--faint);margin-left:auto;white-space:nowrap}
+.tabstrip{display:flex;gap:2px;padding:3px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line)}
+.tabstrip button{height:30px;padding:0 13px;border-radius:7px;font:500 14px/1 var(--f-sans);color:var(--muted);white-space:nowrap}
+.tabstrip button .rec{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--local);margin-left:6px;vertical-align:middle}
+.tabstrip button[aria-selected="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.08),0 0 0 1px var(--line)}
+.tabsum{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;padding-block:32px 8px}
+.tabsum div b{display:block;font:600 15px/1.3 var(--f-sans)}
+.tabsum div span{display:block;font-size:14px;color:var(--muted);margin-top:4px}
+section.band{padding-block:96px}
+section.band.alt{background:var(--bg-2);border-block:1px solid var(--line)}
+.shead{max-width:640px}
+.shead h2{font-size:clamp(30px,4vw,44px);line-height:1.08;letter-spacing:-.035em;margin-top:14px}
+.shead p{font-size:18px;color:var(--fg-2);margin-top:16px;max-width:36em}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px}
+.step{display:flex;flex-direction:column;gap:18px}
+.step .n{font:500 13px/1 var(--f-mono);color:var(--muted)}
+.step h3{font-size:20px;line-height:1.25}
+.step p{font-size:15px;color:var(--muted)}
+.vig{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:16px;min-height:178px;box-shadow:var(--shadow)}
+.vig .q{font:600 15px/1.35 var(--f-sans)}
+.vig .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.vig .chip{height:30px;display:inline-flex;align-items:center;padding:0 11px;border-radius:8px;border:1px solid var(--line);font-size:13px;color:var(--fg-2)}
+.vig .chip.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.vig .row{display:flex;align-items:center;gap:10px;height:38px;border-bottom:1px solid var(--line);font-size:14px}
+.vig .row:last-child{border-bottom:0}
+.vig .row .rk{font:500 12px/1 var(--f-mono);color:var(--muted);width:14px}
+.vig .row .tag{margin-left:auto}
+.vig .ck{display:flex;align-items:center;gap:10px;height:34px;font-size:14px;color:var(--fg-2)}
+.vig .ck i{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line-2);display:grid;place-items:center;flex:none}
+.vig .ck.on i{background:var(--local);border-color:var(--local)}
+.vig .ck.on i svg{stroke:#fff;width:11px;height:11px}
+.vig .ck.on span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line-2)}
+.split{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;margin-top:48px}
+.zone{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);padding:22px}
+.zone.office{border-color:var(--local-line);background:linear-gradient(var(--local-soft),var(--surface) 70%)}
+.zone h4{display:flex;align-items:center;gap:10px;font-size:16px}
+.zone h4 .ic{color:var(--accent)}
+.zone.office h4 .ic{color:var(--local)}
+.zone .sub{font-size:14px;color:var(--muted);margin-top:4px}
+.zone ul{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.zone li{display:flex;align-items:center;gap:10px;height:42px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);font-size:14px}
+.zone li .tag{margin-left:auto}
+.hub{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--muted);font-size:13px;text-align:center}
+.hub .b{display:grid;place-items:center;width:64px;height:64px;border-radius:18px;background:var(--fg);color:var(--bg)}
+.hub .b svg{width:28px;height:28px}
+.hub .ln{width:2px;height:28px;background:var(--line-2)}
+.lsteps{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:56px;padding-top:32px;border-top:1px solid var(--line)}
+.lsteps .n{font:500 13px/1 var(--f-mono);color:var(--local)}
+.lsteps h3{font-size:17px;margin-top:12px}
+.lsteps p{font-size:15px;color:var(--muted);margin-top:6px}
+.qa{margin-top:40px;display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.qa div{border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--surface)}
+.qa b{display:block;font:600 16px/1.35 var(--f-sans)}
+.qa p{font-size:15px;color:var(--muted);margin-top:8px}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px}
+.tier{border:1px solid var(--line);border-radius:var(--r-lg);padding:26px;background:var(--surface);display:flex;flex-direction:column;gap:14px}
+.tier.feat{border-color:var(--fg);box-shadow:var(--shadow)}
+.tier .t{display:flex;align-items:center;gap:10px;font:600 18px/1 var(--f-sans)}
+.tier .price{font:600 24px/1.2 var(--f-sans);letter-spacing:-.02em}
+.tier ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:15px;color:var(--fg-2)}
+.tier li{display:flex;gap:10px;align-items:flex-start}
+.tier li svg{margin-top:3px;color:var(--local)}
+.tier .btn{margin-top:auto}
+.final{padding-block:96px;text-align:center}
+.final h2{font-size:clamp(30px,4.4vw,48px);letter-spacing:-.04em;line-height:1.05}
+.final p{color:var(--muted);margin-top:14px}
+.final .btn{margin-top:28px}
+footer{border-top:1px solid var(--line);padding-block:28px;font-size:13px;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* ---------------- shared app pieces (also used in the landing preview) ---------------- */
+.page{max-width:920px;margin:0 auto;padding-block:36px 64px}
+.ph{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.ph h2{font-size:28px;letter-spacing:-.03em}
+.ph p{color:var(--muted);font-size:15px;margin-top:6px}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.stat{display:flex;flex-direction:column;gap:4px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;min-width:120px}
+.stat b{font:600 20px/1 var(--f-sans);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+.stat.local b{color:var(--local)}
+.tools{margin-top:24px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--surface)}
+.tool{display:grid;grid-template-columns:34px 1fr auto auto 18px;align-items:center;gap:16px;width:100%;padding:18px 20px;text-align:left;border-bottom:1px solid var(--line);transition:background .15s ease}
+.tool:last-child{border-bottom:0}
+.tool:hover{background:var(--bg-2)}
+.tool .rk{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--bg-2);border:1px solid var(--line);font:500 13px/1 var(--f-mono);color:var(--fg-2)}
+.tool .nm{font:600 16px/1.3 var(--f-sans);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tool .why{font-size:14px;color:var(--muted);margin-top:3px;min-width:0}
+.tool .hrs{font:500 13px/1 var(--f-mono);color:var(--fg-2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.tool .chev{color:var(--faint)}
+.tool .done{font:500 12px/1 var(--f-mono);color:var(--local)}
+.news{margin-top:24px;display:flex;flex-direction:column}
+.nitem{display:grid;grid-template-columns:64px 1fr auto;gap:16px;padding:18px 0;border-bottom:1px solid var(--line)}
+.nitem:first-child{border-top:1px solid var(--line)}
+.nitem .d{font:500 13px/1.6 var(--f-mono);color:var(--muted)}
+.nitem h4{font-size:16px;line-height:1.35;letter-spacing:-.01em}
+.nitem p{font-size:14px;color:var(--muted);margin-top:4px}
+.nitem p b{font-weight:500;color:var(--fg-2)}
+.nitem.low h4{color:var(--muted)}
+.seg{display:inline-flex;gap:2px;padding:3px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line)}
+.seg button{height:30px;padding:0 12px;border-radius:7px;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 0 0 1px var(--line)}
+.lhero{margin-top:24px;border:1px solid var(--local-line);background:var(--local-soft);border-radius:16px;padding:24px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center}
+.lhero h3{font-size:20px;line-height:1.3}
+.lhero p{font-size:15px;color:var(--fg-2);margin-top:6px;max-width:44em}
+.lgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.lsmall{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:28px}
+.lsmall div{border-top:1px solid var(--line);padding-top:14px}
+.lsmall .n{font:500 12px/1 var(--f-mono);color:var(--local)}
+.lsmall b{display:block;font-size:15px;margin-top:8px}
+.lsmall p{font-size:14px;color:var(--muted);margin-top:4px}
+/* chat */
+.chat{display:flex;flex-direction:column;min-height:100%}
+.chat .stream{flex:1;max-width:720px;width:100%;margin:0 auto;padding-block:36px 24px;display:flex;flex-direction:column;gap:22px}
+.hello h2{font-size:30px;letter-spacing:-.035em}
+.hello p{color:var(--muted);margin-top:6px}
+.today{border:1px solid var(--line);border-radius:16px;padding:18px;background:var(--surface);box-shadow:var(--shadow)}
+.today .eyebrow{color:var(--accent)}
+.today .tq{font:600 17px/1.35 var(--f-sans);margin-top:10px}
+.today .opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.opt{height:34px;padding:0 13px;border-radius:9px;border:1px solid var(--line-2);font-size:14px;color:var(--fg-2);background:var(--bg)}
+.opt:hover{border-color:var(--fg-2)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.today .ok{display:flex;align-items:center;gap:8px;color:var(--local);font-size:14px;margin-top:12px}
+.sugs{display:flex;flex-wrap:wrap;gap:8px}
+.sug{height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);font-size:14px;color:var(--fg-2);background:var(--surface)}
+.sug:hover{border-color:var(--line-2);background:var(--bg-2)}
+.msg{display:flex;gap:12px;align-items:flex-start}
+.msg.me{justify-content:flex-end}
+.msg.me .bub{background:var(--bg-2);border:1px solid var(--line);border-radius:16px 16px 4px 16px;padding:11px 15px;max-width:80%;white-space:pre-wrap;font-size:15px}
+.msg.ai .av{width:28px;height:28px;border-radius:8px;background:var(--fg);color:var(--bg);display:grid;place-items:center;flex:none;margin-top:2px}
+.msg.ai .av svg{width:16px;height:16px}
+.msg.ai .txt{font-size:15px;line-height:1.62;color:var(--fg);min-width:0}
+.msg.ai .txt p+p,.msg.ai .txt p+ol,.msg.ai .txt ol+p,.msg.ai .txt p+ul,.msg.ai .txt ul+p{margin-top:10px}
+.msg.ai .txt ol,.msg.ai .txt ul{margin:8px 0 0;padding-left:20px}
+.msg.ai .txt li+li{margin-top:4px}
+.msg.ai .meta{font:400 12px/1 var(--f-mono);color:var(--faint);margin-top:8px}
+.thinking{display:inline-flex;gap:4px;padding-top:9px}
+.thinking i{width:6px;height:6px;border-radius:50%;background:var(--faint);animation:blink 1.2s infinite}
+.thinking i:nth-child(2){animation-delay:.2s}.thinking i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.composer{position:sticky;bottom:0;background:linear-gradient(to bottom,transparent,var(--bg) 30%);padding-block:12px calc(16px + env(safe-area-inset-bottom,0px))}
+.composer .box{max-width:720px;margin:0 auto;display:flex;align-items:flex-end;gap:8px;border:1px solid var(--line-2);border-radius:16px;background:var(--surface);padding:8px 8px 8px 16px;box-shadow:var(--shadow)}
+.composer textarea{flex:1;border:0;outline:0;background:transparent;resize:none;font-size:15px;line-height:1.5;padding:7px 0;max-height:160px;min-width:0}
+.composer .send{width:36px;height:36px;border-radius:10px;background:var(--fg);color:var(--bg);display:grid;place-items:center;flex:none}
+.composer .send[disabled]{opacity:.25;cursor:default}
+.composer .hint{max-width:720px;margin:8px auto 0;font-size:12px;color:var(--faint);text-align:center}
+
+/* ---------------- app shell ---------------- */
+#app{min-height:100%;display:flex;flex-direction:column}
+.appbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.appbar .wrap{max-width:none;display:flex;align-items:center;gap:20px;height:60px}
+.appbar .tabstrip{margin:0 auto}
+.appbar .right{display:flex;align-items:center;gap:10px}
+.prev{font:500 12px/1 var(--f-mono);color:var(--muted);border:1px dashed var(--line-2);border-radius:7px;padding:6px 8px;white-space:nowrap}
+.me-btn{width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font:600 14px/1 var(--f-sans);display:grid;place-items:center}
+.menu{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:56px;width:230px;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:var(--shadow-lg);padding:6px}
+.menu .who{padding:10px 10px 8px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.menu .who b{display:block;font-size:14px}
+.menu .who span{font-size:13px;color:var(--muted)}
+.menu button{display:flex;align-items:center;gap:10px;width:100%;height:36px;padding:0 10px;border-radius:8px;font-size:14px;color:var(--fg-2);text-align:left}
+.menu button:hover{background:var(--bg-2)}
+main.tab{flex:1;display:flex;flex-direction:column}
+main.tab>.chat{flex:1}
+main.tab>.wrap{height:100%}
+.sheet-back{position:fixed;inset:0;z-index:40;background:rgba(10,12,16,.28)}
+.sheet{position:fixed;z-index:41;top:0;right:0;bottom:0;width:min(520px,100%);background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--shadow-lg);overflow-y:auto;padding:calc(20px + env(safe-area-inset-top,0px)) max(24px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) 28px;animation:slidein .22s ease}
+@keyframes slidein{from{transform:translateX(24px);opacity:0}to{transform:none;opacity:1}}
+.sheet .x{display:flex;justify-content:space-between;align-items:center}
+.sheet .close{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:var(--muted)}
+.sheet .close:hover{background:var(--bg-2)}
+.sheet h3{font-size:26px;letter-spacing:-.03em;margin-top:18px}
+.sheet .what{color:var(--fg-2);margin-top:8px}
+.sheet .box{border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:20px}
+.sheet .box.local{border-color:var(--local-line);background:var(--local-soft)}
+.sheet .box h4{font-size:14px;letter-spacing:0;display:flex;justify-content:space-between;align-items:center}
+.sheet .box h4 span{font:500 12px/1 var(--f-mono);color:var(--muted)}
+.sheet .box p{font-size:15px;color:var(--fg-2);margin-top:6px}
+.chk{display:flex;align-items:center;gap:12px;width:100%;min-height:46px;padding:8px 0;border-bottom:1px solid var(--line);text-align:left;font-size:15px;color:var(--fg-2)}
+.chk:last-child{border-bottom:0}
+.chk i{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line-2);display:grid;place-items:center;flex:none;transition:background .15s ease}
+.chk i svg{width:12px;height:12px;stroke:#fff;opacity:0}
+.chk.on i{background:var(--local);border-color:var(--local)}
+.chk.on i svg{opacity:1}
+.chk.on span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line-2)}
+.bar{height:6px;border-radius:3px;background:var(--bg-2);overflow:hidden;margin-top:10px}
+.bar span{display:block;height:100%;background:var(--local);border-radius:3px;transition:width .3s ease}
+.sheet .acts{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}
+.sheet .acts .btn{flex:1}
+.sent{display:flex;align-items:flex-start;gap:10px;margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--local-soft);color:var(--local);font-size:14px}
+.sent small{display:block;color:var(--muted);margin-top:2px}
+
+/* ---------------- onboarding ---------------- */
+#onb{min-height:100%;display:flex;flex-direction:column}
+.otop{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg)}
+.otop .wrap{max-width:none;display:flex;align-items:center;justify-content:space-between;height:64px}
+.otop .count{font:500 13px/1 var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.osteps{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.osteps span{font:500 13px/1 var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.segs{display:flex;gap:4px}
+.segs i{flex:1;height:4px;border-radius:2px;background:var(--line);transition:background .25s ease}
+.segs i.on{background:var(--accent)}
+.review{display:flex;flex-direction:column;margin-top:28px;border-top:1px solid var(--line)}
+.review div{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:16px 0;border-bottom:1px solid var(--line);font-size:16px;color:var(--fg-2)}
+.review div b{font-weight:600;color:var(--fg)}
+.review button{font-size:14px;color:var(--accent);flex:none;height:24px}
+.ostage{flex:1;display:flex;justify-content:center;padding-block:clamp(40px,10vh,110px) 40px}
+.ocard{width:100%;max-width:600px;animation:rise .28s ease}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.ocard h1{font-size:clamp(28px,4.6vw,40px);line-height:1.12;letter-spacing:-.035em}
+.ocard .sub{font-size:17px;color:var(--muted);margin-top:12px}
+.ofield{margin-top:32px}
+.ofield input{width:100%;height:60px;border:0;border-bottom:2px solid var(--line-2);background:transparent;font-size:26px;letter-spacing:-.02em;padding:0 2px;outline:0}
+.ofield input:focus{border-bottom-color:var(--accent)}
+.ofield input::placeholder{color:var(--faint)}
+.olist{display:flex;flex-direction:column;gap:8px;margin-top:28px}
+.ogrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:28px}
+.ochoice{display:flex;align-items:center;gap:12px;min-height:54px;padding:10px 14px;border-radius:12px;border:1px solid var(--line-2);background:var(--surface);text-align:left;font-size:15px;color:var(--fg);transition:border-color .12s ease,background .12s ease}
+.ochoice:hover{border-color:var(--fg-2)}
+.ochoice .key{display:grid;place-items:center;width:24px;height:24px;border-radius:6px;border:1px solid var(--line-2);font:500 12px/1 var(--f-mono);color:var(--muted);flex:none}
+.ochoice .ic{color:var(--muted)}
+.ochoice .lab{flex:1;min-width:0}
+.ochoice .tick{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--line-2);display:grid;place-items:center;flex:none}
+.ochoice .tick svg{width:12px;height:12px;stroke:var(--accent-ink);opacity:0}
+.ochoice[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.ochoice[aria-pressed="true"] .key{border-color:var(--accent);color:var(--accent)}
+.ochoice[aria-pressed="true"] .ic{color:var(--accent)}
+.ochoice[aria-pressed="true"] .tick{background:var(--accent);border-color:var(--accent)}
+.ochoice[aria-pressed="true"] .tick svg{opacity:1}
+.ofoot{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:36px}
+.ofoot .back{font-size:15px;color:var(--muted);height:44px;padding:0 4px}
+.ofoot .back:hover{color:var(--fg)}
+.ofoot .right{display:flex;align-items:center;gap:14px}
+.ofoot .enter{font-size:13px;color:var(--faint)}
+.ofoot .enter kbd{font:500 12px/1 var(--f-mono);border:1px solid var(--line-2);border-radius:5px;padding:3px 6px;color:var(--muted)}
+.omore{font-size:13px;color:var(--faint);margin-top:12px}
+.welcome .bul{display:flex;flex-direction:column;gap:14px;margin-top:32px}
+.welcome .bul div{display:flex;gap:14px;align-items:flex-start;font-size:16px;color:var(--fg-2)}
+.welcome .bul .n{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--bg-2);border:1px solid var(--line);font:500 12px/1 var(--f-mono);color:var(--muted);flex:none}
+.build{display:flex;flex-direction:column;gap:14px;margin-top:32px}
+.build div{display:flex;align-items:center;gap:12px;font-size:16px;color:var(--faint);transition:color .2s ease}
+.build div i{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line-2);display:grid;place-items:center;flex:none}
+.build div i svg{width:12px;height:12px;stroke:#fff;opacity:0}
+.build div.on{color:var(--fg)}
+.build div.on i{background:var(--local);border-color:var(--local)}
+.build div.on i svg{opacity:1}
+
+/* ---------------- responsive ---------------- */
+@media (max-width:900px){
+  .nav .links{display:none}
+  .steps,.tiers{grid-template-columns:1fr}
+  .tabsum{grid-template-columns:1fr 1fr}
+  .split{grid-template-columns:1fr}
+  .hub{flex-direction:row;justify-content:center}
+  .hub .ln{width:28px;height:2px}
+  .lsteps{grid-template-columns:1fr 1fr}
+  .qa{grid-template-columns:1fr}
+  .window .body{height:520px}
+  .appbar .wrap{flex-wrap:wrap;height:auto;padding-block:10px;row-gap:10px}
+  .appbar .tabstrip{order:3;width:100%;margin:0;overflow-x:auto}
+  .appbar .tabstrip button{flex:1}
+  .appbar .right{margin-left:auto}
+}
+@media (max-width:600px){
+  section.band{padding-block:64px}
+  .hero{padding-block:44px 28px}
+  .window .chrome{gap:10px}
+  .window .exnote{display:none}
+  .tabstrip button{padding:0 10px;font-size:13px}
+  .tool{grid-template-columns:30px 1fr 18px;gap:12px;padding:16px}
+  .tool .hrs,.tool .tagcell{display:none}
+  .tool .mob{display:flex;gap:8px;align-items:center;margin-top:8px}
+  .nitem{grid-template-columns:1fr;gap:6px}
+  .nitem .tagcell{order:-1}
+  .lhero{grid-template-columns:1fr}
+  .lgrid,.lsmall,.lsteps,.tabsum{grid-template-columns:1fr}
+  .ogrid{grid-template-columns:1fr}
+  .ph h2{font-size:24px}
+  .page{padding-block:24px 48px}
+  .prev{display:none}
+}
+@media (min-width:601px){.tool .mob{display:none}}
+</style>
+
+<!-- =============== LANDING =============== -->
+<div id="landing">
+  <header class="nav" id="nav">
+    <div class="wrap">
+      <a class="mark" href="#top" data-go="top"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="6" fill="currentColor"/><rect x="7" y="7" width="4" height="4" rx="1.2" fill="var(--bg)"/><rect x="13" y="7" width="4" height="4" rx="1.2" fill="var(--bg)"/><rect x="7" y="13" width="4" height="4" rx="1.2" fill="var(--bg)"/><rect x="13" y="13" width="4" height="4" rx="1.2" fill="var(--accent)"/></svg>AI Department</a>
+      <nav class="links" aria-label="Sections"><a href="#how">How it works</a><a href="#local">Local service</a><a href="#pricing">Pricing</a></nav>
+      <span class="sp"></span>
+      <button class="btn sm" data-start>Get started</button>
+    </div>
+  </header>
+
+  <section class="hero" id="top">
+    <div class="wrap">
+      <span class="pill"><i></i>For small businesses</span>
+      <h1>Your AI department, on a subscription.</h1>
+      <p class="lead">Tell it about your business once. It ranks the five AI tools worth using right now, explains why, and walks you through setting each one up.</p>
+      <div class="ctas"><button class="btn blue" data-start>Get started</button><a class="btn ghost" href="#how">See how it works</a></div>
+      <p class="note">Seven questions, about three minutes. Free during the preview.</p>
+    </div>
+  </section>
+
+  <section class="showcase">
+    <div class="wrap">
+      <div class="window">
+        <div class="chrome">
+          <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <div class="tabstrip" role="tablist" aria-label="Preview tabs" id="pvTabs"></div>
+          <span class="exnote">Example: Martin &amp; Co, accounting firm</span>
+        </div>
+        <div class="body" id="pvBody" aria-live="polite"></div>
+      </div>
+      <div class="tabsum">
+        <div><b>Chat</b><span>Ask anything. It already knows your business.</span></div>
+        <div><b>Top 5</b><span>The five tools that save you the most time, and why.</span></div>
+        <div><b>News</b><span>This week's AI news, filtered to what matters to you.</span></div>
+        <div><b>Local</b><span>What should run on a private server in your office.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="how">
+    <div class="wrap">
+      <div class="shead"><span class="eyebrow">How it works</span><h2>Three steps, and you're ahead of most of your competitors.</h2></div>
+      <div class="steps">
+        <div class="step">
+          <div class="vig"><div class="q">Where does your team lose the most time?</div><div class="chips"><span class="chip on">Email</span><span class="chip on">Paperwork</span><span class="chip">Meetings</span><span class="chip">Scheduling</span><span class="chip on">Customer questions</span><span class="chip">Reports</span></div></div>
+          <span class="n">01</span><h3>Answer a few questions</h3><p>Seven questions today, then one a day during your first week. It learns how your business actually runs.</p>
+        </div>
+        <div class="step">
+          <div class="vig"><div class="row"><span class="rk">1</span>Receipt and invoice reader<span class="tag cloud">Cloud</span></div><div class="row"><span class="rk">2</span>Private document assistant<span class="tag local">Local</span></div><div class="row"><span class="rk">3</span>Inbox drafts<span class="tag cloud">Cloud</span></div><div class="row"><span class="rk">4</span>Meeting notes to file<span class="tag cloud">Cloud</span></div></div>
+          <span class="n">02</span><h3>Get your top 5</h3><p>The tools that save you the most hours, ranked for your business and re-ranked as AI changes.</p>
+        </div>
+        <div class="step">
+          <div class="vig"><div class="ck on"><i><svg class="ic" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></i><span>Connect your inbox</span></div><div class="ck on"><i><svg class="ic" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></i><span>Pick 10 replies as examples</span></div><div class="ck"><i></i><span>Turn on drafts for one inbox</span></div><div class="ck"><i></i><span>Review for a week</span></div></div>
+          <span class="n">03</span><h3>Set them up</h3><p>Follow the step-by-step guide, ask the chat anything, or have us set it up for you.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band alt" id="local">
+    <div class="wrap">
+      <div class="shead"><span class="eyebrow">Local service</span><h2>Some work shouldn't leave your office.</h2><p>Client files, contracts, payroll, health records. When a tool in your top 5 touches data like this, we run it on a private AI server in your office instead of the cloud.</p></div>
+      <div class="split">
+        <div class="zone"><h4><svg class="ic" viewBox="0 0 24 24"><path d="M7 18a5 5 0 1 1 .9-9.9A6 6 0 0 1 19 10a4 4 0 0 1-1 8z"/></svg>In the cloud</h4><p class="sub">Everyday tasks. Fast, cheap, always up to date.</p>
+          <ul><li>Inbox drafts<span class="tag cloud">Cloud</span></li><li>Meeting notes to file<span class="tag cloud">Cloud</span></li><li>Receipt and invoice reader<span class="tag cloud">Cloud</span></li></ul></div>
+        <div class="hub"><span class="ln"></span><span class="b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M3 9h18M9 21V9"/></svg></span>One board<span class="ln"></span></div>
+        <div class="zone office"><h4><svg class="ic" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>In your office</h4><p class="sub">Confidential work, on a server you own.</p>
+          <ul><li>Private document assistant<span class="tag local">Local</span></li><li>Payroll checker<span class="tag local">Local</span></li><li>Contract reviewer<span class="tag local">Local</span></li></ul></div>
+      </div>
+      <div class="lsteps" id="lsteps"></div>
+      <div class="qa">
+        <div><b>Is a local model as good as ChatGPT?</b><p>For reading and answering from your own documents, yes. For heavy reasoning on work that isn't sensitive, your board uses cloud models, and it always shows you which is which.</p></div>
+        <div><b>What if the server breaks?</b><p>It's covered by the monthly plan. We monitor it, keep backups, and fix or swap the machine. Your cloud tools keep working in the meantime.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="pricing">
+    <div class="wrap">
+      <div class="shead"><span class="eyebrow">Pricing</span><h2>Start with the board. Add help when you want it.</h2></div>
+      <div class="tiers">
+        <div class="tier feat"><div class="t">Board</div><div class="price">Free during the preview</div>
+          <ul><li><svg class="ic" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>Your top 5, re-ranked as AI changes</li><li><svg class="ic" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>A chat that knows your business</li><li><svg class="ic" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>AI news filtered for you</li><li><svg class="ic" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>Step-by-step setup guides</li></ul>
+          <button class="btn blue" data-start>Get started</button></div>
+        <div class="tier"><div class="t">Setups</div><div class="price">Fixed price per tool</div>
+          <ul><li><svg class="ic" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>We set up any tool in your top 5</li><li><svg class="ic" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>Connected to the tools you already use</li><li><svg class="ic" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>Your team trained on it</li></ul>
+          <button class="btn ghost" data-start>Start with the board</button></div>
+        <div class="tier"><div class="t">Private server</div><div class="price">Hardware + monthly plan</div>
+          <ul><li><svg class="ic" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>A local AI server in your office</li><li><svg class="ic" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>Installed, connected and maintained by us</li><li><svg class="ic" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>Updates and new models included</li></ul>
+          <a class="btn ghost" href="#local">How the local service works</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="final">
+    <div class="wrap"><h2>Seven questions. Five tools that matter.</h2><p>Know exactly which AI tools to use, starting today.</p><button class="btn blue" data-start>Get started</button></div>
+  </section>
+  <footer><div class="wrap"><span>AI Department (working title) · Preview</span><span>Example data on this page is illustrative.</span></div></footer>
+</div>
+
+<!-- =============== ONBOARDING =============== -->
+<div id="onb" hidden>
+  <div class="otop"><div class="wrap"><a class="mark" href="#top" data-go="top"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="6" fill="currentColor"/><rect x="7" y="7" width="4" height="4" rx="1.2" fill="var(--bg)"/><rect x="13" y="7" width="4" height="4" rx="1.2" fill="var(--bg)"/><rect x="7" y="13" width="4" height="4" rx="1.2" fill="var(--bg)"/><rect x="13" y="13" width="4" height="4" rx="1.2" fill="var(--accent)"/></svg>AI Department</a><span class="count" id="onbCount"></span></div></div>
+  <div class="ostage"><div class="wrap" style="width:100%;display:flex;justify-content:center"><div class="ocard" id="onbCard"></div></div></div>
+</div>
+
+<!-- =============== APP =============== -->
+<div id="app" hidden>
+  <header class="appbar">
+    <div class="wrap">
+      <a class="mark" href="#top" data-go="top"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="6" fill="currentColor"/><rect x="7" y="7" width="4" height="4" rx="1.2" fill="var(--bg)"/><rect x="13" y="7" width="4" height="4" rx="1.2" fill="var(--bg)"/><rect x="7" y="13" width="4" height="4" rx="1.2" fill="var(--bg)"/><rect x="13" y="13" width="4" height="4" rx="1.2" fill="var(--accent)"/></svg><span id="appBiz">AI Department</span></a>
+      <div class="tabstrip" role="tablist" aria-label="App tabs" id="appTabs"></div>
+      <div class="right"><span class="prev">Preview</span><button class="me-btn" id="meBtn" aria-haspopup="menu" aria-expanded="false" aria-label="Account menu"></button></div>
+    </div>
+    <div class="menu" id="menu" role="menu" hidden></div>
+  </header>
+  <main class="tab" id="appMain"></main>
+</div>
+<div id="sheetRoot"></div>
+
+<script>
+(() => {
+'use strict';
+// ---------- helpers ----------
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const I = {
+  check: '<path d="M5 12l5 5 9-10"/>', chev: '<path d="M9 6l6 6-6 6"/>', x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  cloud: '<path d="M7 18a5 5 0 1 1 .9-9.9A6 6 0 0 1 19 10a4 4 0 0 1-1 8z"/>', lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  send: '<path d="M12 19V5M6 11l6-6 6 6"/>', chat: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  calc: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2M14 11h2M8 15h2M14 15h2M8 18h2M14 18h2"/>', scale: '<path d="M12 3v18M6 21h12M5 7h14M5 7l-3 7a3.5 3.5 0 0 0 6 0zM19 7l-3 7a3.5 3.5 0 0 0 6 0z"/>',
+  cross: '<rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/>', spark: '<path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/>',
+  home: '<path d="M3 11l9-7 9 7M5 10v10h14V10"/>', bag: '<path d="M5 8h14l-1 13H6zM9 8a3 3 0 0 1 6 0"/>', tool: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-2.5z"/>',
+  dots: '<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>', back: '<path d="M15 6l-6 6 6 6"/>', reset: '<path d="M4 4v6h6M20 20v-6h-6M5.5 15a7.5 7.5 0 0 0 13 2M18.5 9a7.5 7.5 0 0 0-13-2"/>',
+  web: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>', server: '<rect x="4" y="4" width="16" height="7" rx="2"/><rect x="4" y="13" width="16" height="7" rx="2"/><path d="M8 7.5h.01M8 16.5h.01"/>',
+};
+const ic = (n, cls = 'ic') => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${I[n] || ''}</svg>`;
+const MARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="6" fill="currentColor"/><rect x="7" y="7" width="4" height="4" rx="1.2" fill="var(--fg)"/><rect x="13" y="7" width="4" height="4" rx="1.2" fill="var(--fg)"/><rect x="7" y="13" width="4" height="4" rx="1.2" fill="var(--fg)"/><rect x="13" y="13" width="4" height="4" rx="1.2" fill="var(--accent)"/></svg>';
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('aidept.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('aidept.' + k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { try { localStorage.removeItem('aidept.' + k); } catch (e) {} },
+};
+
+// ---------- data ----------
+const INDUSTRIES = [
+  { id: 'accounting', label: 'Accounting or bookkeeping', short: 'accounting firms', one: 'accounting firm', icon: 'calc' },
+  { id: 'law', label: 'Law firm', short: 'law firms', one: 'law firm', icon: 'scale' },
+  { id: 'clinic', label: 'Health clinic', short: 'clinics', one: 'health clinic', icon: 'cross' },
+  { id: 'agency', label: 'Marketing or creative agency', short: 'agencies', one: 'agency', icon: 'spark' },
+  { id: 'realestate', label: 'Real estate', short: 'real estate agencies', one: 'real estate agency', icon: 'home' },
+  { id: 'ecom', label: 'Online shop', short: 'online shops', one: 'online shop', icon: 'bag' },
+  { id: 'trades', label: 'Trades or local services', short: 'local service businesses', one: 'local service business', icon: 'tool' },
+  { id: 'other', label: 'Something else', short: 'businesses like yours', one: 'business', icon: 'dots' },
+];
+const SIZES = [{ id: 'solo', label: 'Just me', ph: 'run by one person', m: 0.5 }, { id: 'small', label: '2 to 10 people', ph: 'with 2 to 10 people', m: 1 }, { id: 'mid', label: '11 to 50 people', ph: 'with 11 to 50 people', m: 2 }, { id: 'large', label: 'More than 50', ph: 'with more than 50 people', m: 3 }];
+const sizePh = id => (SIZES.find(s => s.id === id) || SIZES[1]).ph;
+const PAINS = [
+  { id: 'email', label: 'Email' }, { id: 'paperwork', label: 'Paperwork and data entry' }, { id: 'meetings', label: 'Meetings and notes' },
+  { id: 'support', label: 'Customer questions' }, { id: 'sales', label: 'Sales follow-up' }, { id: 'scheduling', label: 'Scheduling' },
+  { id: 'reports', label: 'Reports' }, { id: 'content', label: 'Marketing content' }, { id: 'hiring', label: 'Hiring' },
+];
+const USED = ['Gmail', 'Outlook', 'Google Drive', 'Microsoft 365', 'Slack', 'WhatsApp', 'HubSpot', 'Notion', 'QuickBooks', 'Xero', 'Excel', 'Shopify'];
+const SENS = [
+  { id: 'clientfiles', label: 'Client files and contracts' }, { id: 'financial', label: "Clients' financial records" },
+  { id: 'payroll', label: 'Payroll and HR' }, { id: 'health', label: 'Health records' }, { id: 'none', label: 'None of these' },
+];
+const CATALOG = [
+  { id: 'inbox', name: 'Inbox drafts', what: 'Drafts replies to routine emails in your tone. You read, edit and send.', pains: ['email', 'support'], hrs: 4,
+    steps: ['Connect your {mail} inbox', 'Pick 10 past replies as examples of your tone', 'Turn on drafts for one shared inbox', 'Review the drafts for a week, then widen it'] },
+  { id: 'notes', name: 'Meeting notes to file', what: 'Records your calls, writes the summary and files it with the right client.', pains: ['meetings'], hrs: 3,
+    steps: ['Connect your calendar', 'Choose where summaries are saved', 'Tell clients calls are recorded', 'Check the first five summaries'] },
+  { id: 'receipts', name: 'Receipt and invoice reader', what: 'Reads receipts and invoices and enters them for you.', pains: ['paperwork'], ind: ['accounting', 'ecom', 'trades', 'realestate'], hrs: 5,
+    steps: ['Connect {books}', 'Forward your receipts inbox to it', 'Test it on 10 real receipts', 'Turn on automatic categories'] },
+  { id: 'docs', name: 'Private document assistant', what: 'Answers questions from your own files, on a server in your office.', pains: ['paperwork', 'support'], sens: ['clientfiles', 'financial', 'health'], local: true, hrs: 5,
+    steps: ['Book the server install', 'Choose which folders it can read', 'Ask it 10 questions you already know the answers to', 'Show the team how to use it'] },
+  { id: 'payroll', name: 'Payroll checker', what: 'Checks payslips against contracts and flags errors before they go out.', sens: ['payroll'], local: true, hrs: 2,
+    steps: ['Book the server install', 'Connect last month\'s payroll export', 'Review the flags it raises', 'Run it before every pay run'] },
+  { id: 'contracts', name: 'Contract reviewer', what: 'Reads contracts, flags risky clauses and compares versions.', ind: ['law', 'realestate', 'agency'], needInd: true, sens: ['clientfiles'], local: true, hrs: 4,
+    steps: ['Book the server install', 'Load your standard clauses', 'Run it on three past contracts', 'Use it on every new draft'] },
+  { id: 'intake', name: 'Patient intake and notes', what: 'Turns intake forms and consultations into structured notes.', ind: ['clinic'], needInd: true, sens: ['health'], local: true, hrs: 5,
+    steps: ['Book the server install', 'Connect your intake form', 'Try it on five consultations', 'Agree the note format with your team'] },
+  { id: 'faq', name: 'Customer question assistant', what: 'Answers common questions on your website and WhatsApp, and hands the rest to you.', pains: ['support'], hrs: 4,
+    steps: ['List your 20 most common questions', 'Write or approve the answers', 'Add it to your website', 'Check its conversations every Friday'] },
+  { id: 'followup', name: 'Sales follow-up writer', what: 'Writes the follow-up after every call or quote, so none slip.', pains: ['sales'], hrs: 3,
+    steps: ['Connect your {mail} inbox', 'Connect your calendar', 'Pick your follow-up templates', 'Approve each draft before it sends'] },
+  { id: 'quotes', name: 'Quote builder', what: 'Turns a call or site visit into a clean quote in minutes.', ind: ['trades', 'agency'], pains: ['sales'], hrs: 3,
+    steps: ['Upload your price list', 'Pick a quote template', 'Dictate a quote from your last job', 'Send the first one'] },
+  { id: 'schedule', name: 'Scheduling assistant', what: 'Books, moves and confirms appointments by email or message.', pains: ['scheduling'], ind: ['clinic', 'trades'], hrs: 2,
+    steps: ['Connect your calendar', 'Set your hours and buffers', 'Add the booking link to your emails', 'Turn on reminders'] },
+  { id: 'reports', name: 'Weekly report builder', what: 'Pulls your numbers into a one-page summary every Monday.', pains: ['reports'], hrs: 2,
+    steps: ['Connect {sheet}', 'Pick the five numbers that matter', 'Choose who gets it', 'Read the first one together'] },
+  { id: 'content', name: 'Content repurposer', what: 'Turns one video, post or article into a week of content.', pains: ['content'], ind: ['agency', 'ecom'], hrs: 3,
+    steps: ['Upload three posts you like', 'Pick your channels', 'Give it one long piece', 'Approve the week of posts'] },
+  { id: 'products', name: 'Product description writer', what: 'Writes and updates product pages in your brand voice.', ind: ['ecom'], needInd: true, hrs: 3,
+    steps: ['Connect your shop', 'Pick five pages as style examples', 'Rewrite ten slow sellers', 'Compare sales after a month'] },
+  { id: 'listings', name: 'Listing writer', what: 'Writes property listings from your photos and notes.', ind: ['realestate'], needInd: true, hrs: 2,
+    steps: ['Upload three past listings', 'Add photos and notes for a new one', 'Edit the draft', 'Publish it'] },
+  { id: 'hiring', name: 'Candidate screener', what: 'Sorts applications against your criteria and drafts replies.', pains: ['hiring'], hrs: 2,
+    steps: ['Write your must-haves', 'Connect your jobs inbox', 'Check its first ten rankings', 'Send replies from the drafts'] },
+];
+const EXAMPLE = { name: 'Claire', biz: 'Martin & Co', industry: 'accounting', size: 'small', pains: ['paperwork', 'email', 'meetings'], used: ['Outlook', 'Excel', 'QuickBooks'], sensitive: ['clientfiles', 'payroll'], channel: 'Referrals' };
+
+// ---------- ranking ----------
+const labelOf = (arr, id) => (arr.find(x => x.id === id) || {}).label || '';
+const lc = s => s ? s.charAt(0).toLowerCase() + s.slice(1) : '';
+const list = a => a.length < 2 ? (a[0] || '') : a.slice(0, -1).join(', ') + (a.length > 2 || a.some(x => x.includes(' and ')) ? ',' : '') + ' and ' + a[a.length - 1];
+function rank(P) {
+  const sens = (P.sensitive || []).filter(s => s !== 'none');
+  const m = (SIZES.find(s => s.id === P.size) || SIZES[1]).m;
+  const scored = CATALOG.map(t => {
+    const pm = (t.pains || []).filter(p => (P.pains || []).includes(p));
+    const im = (t.ind || []).includes(P.industry);
+    const sm = (t.sens || []).filter(s => sens.includes(s));
+    if (t.local && !sm.length) return null;
+    if (t.needInd && !im) return null;
+    const score = pm.length * 3 + (im ? 2 : 0) + (sm.length ? 2 : 0) + t.hrs / 10;
+    return { ...t, pm, im, sm, score, h: Math.max(1, Math.round(t.hrs * m)) };
+  }).filter(Boolean).sort((a, b) => b.score - a.score || b.hrs - a.hrs);
+  return scored.slice(0, 5).map(t => ({ ...t, why: whyOf(t, P) }));
+}
+function whyOf(t, P) {
+  const ind = INDUSTRIES.find(i => i.id === P.industry) || INDUSTRIES[7];
+  const parts = [];
+  if (t.pm.length) parts.push(`You said your team loses time on ${lc(labelOf(PAINS, t.pm[0]))}.`);
+  if (t.im) parts.push(`One of the quickest wins for ${ind.short}.`);
+  if (t.sm.length) parts.push(`It touches ${lc(labelOf(SENS, t.sm[0]))}, so it runs in your office.`);
+  if (!parts.length) parts.push(`Saves time for ${ind.short} of your size.`);
+  return parts.join(' ');
+}
+const stepsOf = (t, P) => t.steps.map(s => s.replace('{mail}', (P.used || []).includes('Outlook') ? 'Outlook' : (P.used || []).includes('Gmail') ? 'Gmail' : 'email')
+  .replace('{books}', (P.used || []).find(u => ['QuickBooks', 'Xero'].includes(u)) || 'your accounting software')
+  .replace('{sheet}', (P.used || []).includes('Excel') ? 'your Excel files' : (P.used || []).includes('Google Drive') ? 'your Google Sheets' : 'your spreadsheets'));
+
+// ---------- news (sample stories, personalised lines) ----------
+const NEWS = [
+  { d: 'Oct 20', h: 'Open models now run well on a single office machine', rel: P => hasSens(P) ? 'high' : 'medium',
+    fy: P => hasSens(P) ? `${P.biz} could run AI on client files without sending them anywhere.` : 'Useful later, if you start handling sensitive files.' },
+  { d: 'Oct 19', h: 'Meeting notetakers now file summaries to your CRM on their own', rel: P => has(P, 'meetings') ? 'high' : 'low',
+    fy: P => has(P, 'meetings') ? 'Directly relevant: meetings are one of your biggest time sinks.' : 'Skip for now. Meetings are not where you lose time.' },
+  { d: 'Oct 18', h: 'Email assistants can learn your tone from your sent folder', rel: P => has(P, 'email') ? 'high' : 'medium',
+    fy: P => has(P, 'email') ? 'Makes the Inbox drafts tool in your top 5 sound more like you.' : 'Worth knowing if email volume grows.' },
+  { d: 'Oct 16', h: 'Invoice readers get better at crumpled and handwritten receipts', rel: P => has(P, 'paperwork') || P.industry === 'accounting' ? 'high' : 'low',
+    fy: P => has(P, 'paperwork') ? 'Less manual entry for your team, especially at month end.' : 'Skip. Paperwork is not your bottleneck.' },
+  { d: 'Oct 15', h: 'Website chat assistants add hand-off to WhatsApp', rel: P => has(P, 'support') ? 'high' : 'low',
+    fy: P => has(P, 'support') ? 'Your customers can get answers at night and reach you by morning.' : 'Skip for now.' },
+  { d: 'Oct 14', h: 'AI receptionists now answer the phone around the clock', rel: P => ['clinic', 'trades'].includes(P.industry) || has(P, 'scheduling') ? 'medium' : 'low',
+    fy: P => ['clinic', 'trades'].includes(P.industry) || has(P, 'scheduling') ? 'Could cut missed calls and no-shows.' : 'Skip. Your clients mostly email.' },
+  { d: 'Oct 13', h: 'Spreadsheet assistants can now build a weekly report from a prompt', rel: P => has(P, 'reports') ? 'high' : 'medium',
+    fy: P => has(P, 'reports') ? 'Your Monday numbers could write themselves.' : 'A quick win once your top 5 is running.' },
+];
+const has = (P, p) => (P.pains || []).includes(p);
+const hasSens = P => (P.sensitive || []).some(s => s !== 'none');
+
+// ---------- local service steps (landing + app) ----------
+const LSTEPS = [
+  ['We flag it', 'Your board marks every tool that touches sensitive data.'],
+  ['We install the server', 'One visit: we set up the machine, connect your files and train your team.'],
+  ['You own it', 'The hardware is yours. Your data never leaves the building.'],
+  ['We keep it current', 'A monthly plan covers updates, new models and support.'],
+];
+
+// ---------- renderers (shared by the landing preview and the app) ----------
+function tagFor(t) { return t.local ? `<span class="tag local">${ic('lock')}Local</span>` : `<span class="tag cloud">${ic('cloud')}Cloud</span>`; }
+function renderTop5(P, opts = {}) {
+  const top = rank(P), total = top.reduce((a, t) => a + t.h, 0), loc = top.filter(t => t.local).length;
+  const prog = opts.progress || {};
+  return `<div class="page wrap"><div class="ph"><div><h2>Your top 5</h2><p>Ranked for ${esc(P.biz)} from your answers. Updated today.</p></div>
+    <div class="stats"><div class="stat"><b>~${total} h</b><span>saved per week</span></div><div class="stat local"><b>${loc} of 5</b><span>run in your office</span></div></div></div>
+    <div class="tools">${top.map((t, i) => {
+      const done = (prog[t.id] || []).length, n = t.steps.length;
+      return `<button class="tool" data-tool="${t.id}"><span class="rk">${i + 1}</span><span style="min-width:0"><span class="nm">${esc(t.name)}${done ? `<span class="done">${done === n ? 'Set up' : done + '/' + n + ' done'}</span>` : ''}</span><span class="why" style="display:block">${esc(t.why)}</span><span class="mob"><span class="hrs">~${t.h} h/wk</span>${tagFor(t)}</span></span><span class="hrs">~${t.h} h/wk</span><span class="tagcell">${tagFor(t)}</span>${ic('chev', 'ic chev')}</button>`;
+    }).join('')}</div></div>`;
+}
+function renderNews(P, filter = 'all') {
+  const items = NEWS.map(n => ({ ...n, r: n.rel(P), f: n.fy(P) })).filter(n => filter === 'all' || n.r !== 'low');
+  return `<div class="page wrap"><div class="ph"><div><h2>AI news for you</h2><p>This week, filtered for ${esc(P.biz)}. Sample stories in this preview.</p></div>
+    <div class="seg" role="group" aria-label="Filter"><button data-nf="all" aria-pressed="${filter === 'all'}">All</button><button data-nf="rel" aria-pressed="${filter !== 'all'}">Relevant to you</button></div></div>
+    <div class="news">${items.map(n => `<div class="nitem ${n.r === 'low' ? 'low' : ''}"><span class="d">${n.d}</span><div><h4>${esc(n.h)}</h4><p><b>For you:</b> ${esc(n.f)}</p></div><span class="tagcell"><span class="tag ${n.r}">${n.r === 'high' ? 'High' : n.r === 'medium' ? 'Medium' : 'Low'}</span></span></div>`).join('')}</div></div>`;
+}
+function renderLocal(P, opts = {}) {
+  const top = rank(P), loc = top.filter(t => t.local), cloud = top.filter(t => !t.local);
+  const head = loc.length
+    ? `<h3>${loc.length === 1 ? 'One' : loc.length} of your top 5 should run in your office.</h3><p>${loc.length === 1 ? 'It touches' : 'They touch'} ${esc(list((P.sensitive || []).filter(s => s !== 'none').map(s => lc(labelOf(SENS, s)))))}. We install a private AI server at ${esc(P.biz)} so that data never leaves the building.</p>`
+    : `<h3>Nothing in your top 5 needs to stay in your office.</h3><p>If you start working with client files, contracts, payroll or health records, your board will flag the tools that should run locally.</p>`;
+  const btn = opts.requested ? `<div class="sent">${ic('check')}<div>Visit requested<small>Preview: nothing is sent yet.</small></div></div>` : `<button class="btn" data-visit ${loc.length ? '' : 'disabled'}>Book a visit</button>`;
+  return `<div class="page wrap"><div class="ph"><div><h2>Local service</h2><p>What runs in the cloud, and what stays with you.</p></div></div>
+    <div class="lhero"><div>${head}</div><div>${btn}</div></div>
+    <div class="lgrid">
+      <div class="zone"><h4>${ic('cloud')}In the cloud</h4><p class="sub">Everyday tasks</p><ul>${cloud.map(t => `<li>${esc(t.name)}${tagFor(t)}</li>`).join('') || '<li>Nothing yet</li>'}</ul></div>
+      <div class="zone office"><h4>${ic('lock')}In your office</h4><p class="sub">Private AI server, owned by you</p><ul>${loc.map(t => `<li>${esc(t.name)}${tagFor(t)}</li>`).join('') || '<li style="color:var(--muted)">Nothing needs it yet</li>'}</ul></div>
+    </div>
+    <div class="lsmall">${LSTEPS.map((s, i) => `<div><span class="n">0${i + 1}</span><b>${s[0]}</b><p>${s[1]}</p></div>`).join('')}</div></div>`;
+}
+function chatGreeting(P) { const p = (P.pains || [])[0]; return `<div class="hello"><h2>Hi ${esc(P.name)}. What do you want to get done?</h2><p>${p ? `You said ${esc(lc(labelOf(PAINS, p)))} takes up the most time at ${esc(P.biz)}. Want to start there?` : `I know ${esc(P.biz)}'s top 5 and what you told me during onboarding.`}</p></div>`; }
+
+// ---------- landing preview ----------
+const TABS = [['chat', 'Chat'], ['top5', 'Top 5'], ['news', 'News'], ['local', 'Local']];
+let pvTab = store.get('pvTab', 'top5');
+function drawPreview() {
+  $('#pvTabs').innerHTML = TABS.map(([id, l]) => `<button role="tab" aria-selected="${pvTab === id}" data-pv="${id}">${l}</button>`).join('');
+  const P = EXAMPLE, body = $('#pvBody');
+  if (pvTab === 'top5') body.innerHTML = renderTop5(P);
+  else if (pvTab === 'news') body.innerHTML = renderNews(P, 'all');
+  else if (pvTab === 'local') body.innerHTML = renderLocal(P);
+  else body.innerHTML = `<div class="chat"><div class="stream wrap">${chatGreeting(P)}
+    <div class="msg me"><div class="bub">Which one should I start with?</div></div>
+    <div class="msg ai"><span class="av">${MARK}</span><div class="txt"><p>Start with the <strong>receipt and invoice reader</strong>. It saves the most time (about 5 hours a week for a team your size) and takes about 20 minutes to set up.</p><ol><li>Connect QuickBooks.</li><li>Forward your receipts inbox to it.</li><li>Test it on 10 real receipts.</li></ol><p>Once that runs, the private document assistant is next. It needs the server install, so I'd book that visit now.</p></div></div></div></div>`;
+  body.querySelectorAll('button').forEach(b => { if (!b.closest('.seg')) b.tabIndex = -1; });
+}
+$('#pvTabs').addEventListener('click', e => { const b = e.target.closest('[data-pv]'); if (!b) return; pvTab = b.dataset.pv; store.set('pvTab', pvTab); drawPreview(); });
+$('#pvBody').addEventListener('click', e => { const b = e.target.closest('[data-nf]'); if (b) { $('#pvBody').innerHTML = renderNews(EXAMPLE, b.dataset.nf); } });
+$('#lsteps').innerHTML = LSTEPS.map((s, i) => `<div><span class="n">0${i + 1}</span><h3>${s[0]}</h3><p>${s[1]}</p></div>`).join('');
+addEventListener('scroll', () => $('#nav').classList.toggle('scrolled', scrollY > 8), { passive: true });
+
+// ---------- state ----------
+let P = store.get('profile', null);            // finished onboarding answers
+let draft = store.get('draft', { pains: [], used: [], sensitive: [] });
+let step = store.get('step', 0);
+let tab = store.get('tab', 'top5');
+let progress = store.get('progress', {});      // tool id -> [done step indexes]
+let requested = store.get('requested', {});    // tool id / 'visit' -> true
+let turns = store.get('turns', []);            // chat history [{role, content, fallback?}]
+let newsFilter = 'all';
+
+// ---------- routing ----------
+function show(view) {
+  $('#landing').hidden = view !== 'landing'; $('#onb').hidden = view !== 'onb'; $('#app').hidden = view !== 'app';
+  document.documentElement.style.height = view === 'landing' ? '' : '100%';
+  document.body.style.height = view === 'landing' ? '' : '100%';
+}
+function route() {
+  if (location.hash === '#app') { if (P) { show('app'); drawApp(); } else { show('onb'); drawStep(); } }
+  else { show('landing'); drawPreview(); }
+}
+function go(h) { if (location.hash === h) route(); else location.hash = h; scrollTo(0, 0); }
+document.addEventListener('click', e => {
+  if (e.target.closest('[data-start]')) { e.preventDefault(); go('#app'); }
+  const t = e.target.closest('[data-go="top"]'); if (t && !$('#landing').hidden) { e.preventDefault(); scrollTo({ top: 0, behavior: 'smooth' }); } else if (t) { e.preventDefault(); history.pushState('', '', location.pathname + location.search); route(); scrollTo(0, 0); }
+});
+addEventListener('hashchange', route);
+
+// ---------- onboarding ----------
+const STEPS = [
+  { kind: 'welcome' },
+  { key: 'name', type: 'text', q: "First, what's your name?", sub: 'So your assistant knows who it is talking to.', ph: 'Your first name' },
+  { key: 'biz', type: 'text', q: d => `Nice to meet you, ${d.name}. What's your business called?`, ph: 'Business name' },
+  { key: 'industry', type: 'single', q: 'What kind of business is it?', opts: INDUSTRIES.map(i => ({ id: i.id, label: i.label, icon: i.icon })), grid: true },
+  { key: 'size', type: 'single', q: 'How many people work there?', opts: SIZES.map(s => ({ id: s.id, label: s.label })) },
+  { key: 'pains', type: 'multi', max: 3, q: 'Where does your team lose the most time?', sub: 'Pick up to three.', opts: PAINS.map(p => ({ id: p.id, label: p.label })), grid: true },
+  { key: 'used', type: 'multi', q: 'Which tools do you already use?', sub: "Your top 5 will plug into these. Skip if you're not sure.", opts: USED.map(u => ({ id: u, label: u })), grid: true, optional: true },
+  { key: 'sensitive', type: 'multi', q: 'Does your work involve any of these?', sub: 'Tools that touch this data run on a private server in your office instead of the cloud.', opts: SENS.map(s => ({ id: s.id, label: s.label })), exclusive: 'none' },
+  { kind: 'review' },
+  { kind: 'build' },
+];
+const QN = STEPS.filter(s => s.key).length;
+function saveDraft() { store.set('draft', draft); store.set('step', step); }
+function valid(s) {
+  if (!s.key) return true;
+  const v = draft[s.key];
+  if (s.type === 'text') return !!(v && String(v).trim());
+  if (s.type === 'single') return !!v;
+  return s.optional || (Array.isArray(v) && v.length > 0);
+}
+function drawStep() {
+  const s = STEPS[step], card = $('#onbCard');
+  const qi = STEPS.slice(0, step + 1).filter(x => x.key).length;
+  $('#onbCount').textContent = s.kind === 'welcome' ? 'About 3 minutes' : '';
+  const segs = (s.key || s.kind === 'review') ? `<div class="osteps"><span>${s.key ? `Step ${qi} of ${QN}` : 'Last check'}</span><div class="segs">${Array.from({ length: QN }, (_, k) => `<i class="${k < (s.key ? qi : QN) ? 'on' : ''}"></i>`).join('')}</div></div>` : '';
+  if (s.kind === 'welcome') {
+    card.innerHTML = `<div class="welcome"><h1>Let's set up your AI department.</h1><p class="sub">Seven quick questions now. After that, one question a day during your first week, so it keeps learning.</p>
+      <div class="bul"><div><span class="n">1</span>Tell it about your business</div><div><span class="n">2</span>Get the five AI tools worth using right now</div><div><span class="n">3</span>Set them up with a guide, the chat, or our team</div></div>
+      <div class="ofoot"><span></span><div class="right"><span class="enter">press <kbd>Enter ↵</kbd></span><button class="btn blue" data-next>Start</button></div></div></div>`;
+  } else if (s.kind === 'review') {
+    const d = draft, ind = (INDUSTRIES.find(i => i.id === d.industry) || INDUSTRIES[7]).one, sens = (d.sensitive || []).filter(x => x !== 'none');
+    const line = (html, k) => `<div><span>${html}</span><button data-edit="${k}">Edit</button></div>`;
+    card.innerHTML = `${segs}<h1>Here's what I learned.</h1><p class="sub">Check it before I rank your tools. You can change anything later.</p>
+      <div class="review">
+        ${line(`<b>${esc(d.biz)}</b> is ${/^[aeiou]/.test(ind) ? 'an' : 'a'} ${esc(ind)} ${esc(sizePh(d.size))}.`, 'industry')}
+        ${line(`Your team loses the most time on <b>${esc(list((d.pains || []).map(p => lc(labelOf(PAINS, p)))))}</b>.`, 'pains')}
+        ${line((d.used || []).length ? `You already use <b>${esc(list(d.used))}</b>.` : 'You did not list any tools yet.', 'used')}
+        ${line(sens.length ? `You handle <b>${esc(list(sens.map(x => lc(labelOf(SENS, x)))))}</b>, so some tools should run in your office.` : 'Nothing you handle needs to stay in your office.', 'sensitive')}
+      </div>
+      <div class="ofoot"><button class="back" data-prev>← Back</button><div class="right"><span class="enter">press <kbd>Enter ↵</kbd></span><button class="btn blue" data-next>Looks right</button></div></div>`;
+  } else if (s.kind === 'build') {
+    const tmp = { ...draft, sensitive: draft.sensitive || [] }, top = rank(tmp), nl = top.filter(t => t.local).length;
+    const indS = (INDUSTRIES.find(i => i.id === draft.industry) || INDUSTRIES[7]).one;
+    card.innerHTML = `<h1>Building your board.</h1><p class="sub">This takes a few seconds.</p>
+      <div class="build">${['Reading your answers', `Ranking ${CATALOG.length} tools for ${/^[aeiou]/.test(indS) ? 'an' : 'a'} ${indS} ${sizePh(draft.size)}`, nl ? `Flagging ${nl} that should stay in your office` : 'Checking what could stay in your office', 'Writing your top 5'].map(t => `<div><i>${ic('check')}</i>${esc(t)}</div>`).join('')}</div>`;
+    const rows = $$('.build div', card);
+    rows.forEach((r, i) => setTimeout(() => r.classList.add('on'), 450 + i * 520));
+    setTimeout(finishOnboarding, 450 + rows.length * 520 + 350);
+  } else {
+    const q = typeof s.q === 'function' ? s.q(draft) : s.q;
+    let body = '';
+    if (s.type === 'text') body = `<div class="ofield"><input id="ofield-${s.key}" autocomplete="off" placeholder="${esc(s.ph)}" value="${esc(draft[s.key] || '')}" maxlength="60"></div>`;
+    else {
+      const sel = s.type === 'single' ? [draft[s.key]] : (draft[s.key] || []);
+      body = `<div class="${s.grid ? 'ogrid' : 'olist'}">${s.opts.map((o, i) => `<button class="ochoice" data-opt="${esc(o.id)}" aria-pressed="${sel.includes(o.id)}">${i < 9 ? `<span class="key">${i + 1}</span>` : '<span class="key"></span>'}${o.icon ? ic(o.icon) : ''}<span class="lab">${esc(o.label)}</span>${s.type === 'multi' ? `<span class="tick">${ic('check')}</span>` : ''}</button>`).join('')}</div>`;
+    }
+    card.innerHTML = `${segs}<h1>${esc(q)}</h1>${s.sub ? `<p class="sub">${esc(s.sub)}</p>` : ''}${body}
+      <div class="ofoot"><button class="back" data-prev>← Back</button><div class="right"><span class="enter">press <kbd>Enter ↵</kbd></span><button class="btn blue" data-next ${valid(s) ? '' : 'disabled'}>${s.optional && !(draft[s.key] || []).length ? 'Skip' : 'Continue'}</button></div></div>`;
+    const inp = $('input', card); if (inp) { inp.focus(); inp.addEventListener('input', () => { draft[s.key] = inp.value; saveDraft(); $('[data-next]', card).disabled = !valid(s); }); }
+  }
+  card.style.animation = 'none'; void card.offsetWidth; card.style.animation = '';
+}
+function pick(id) {
+  const s = STEPS[step]; if (!s.opts) return;
+  if (s.type === 'single') { draft[s.key] = id; saveDraft(); drawStep(); setTimeout(next, 220); return; }
+  let v = draft[s.key] || [];
+  if (v.includes(id)) v = v.filter(x => x !== id);
+  else if (s.exclusive && id === s.exclusive) v = [id];
+  else { v = v.filter(x => x !== s.exclusive); if (s.max && v.length >= s.max) v = v.slice(1); v = [...v, id]; }
+  draft[s.key] = v; saveDraft(); drawStep();
+}
+function next() { const s = STEPS[step]; if (!valid(s)) return; if (step < STEPS.length - 1) { step++; saveDraft(); drawStep(); } }
+function prev() { if (step > 0) { step--; saveDraft(); drawStep(); } }
+$('#onbCard').addEventListener('click', e => {
+  const o = e.target.closest('[data-opt]'); if (o) return pick(o.dataset.opt);
+  if (e.target.closest('[data-next]')) return next();
+  if (e.target.closest('[data-prev]')) return prev();
+  const ed = e.target.closest('[data-edit]'); if (ed) { step = STEPS.findIndex(x => x.key === ed.dataset.edit); saveDraft(); drawStep(); }
+});
+document.addEventListener('keydown', e => {
+  if ($('#onb').hidden) return;
+  const s = STEPS[step];
+  if (e.key === 'Enter') { e.preventDefault(); next(); }
+  else if (s.opts && /^[1-9]$/.test(e.key) && document.activeElement?.tagName !== 'INPUT') { const o = s.opts[+e.key - 1]; if (o) pick(o.id); }
+  else if (e.key === 'Escape') prev();
+});
+function finishOnboarding() {
+  P = { name: draft.name.trim(), biz: draft.biz.trim(), industry: draft.industry, size: draft.size, pains: draft.pains || [], used: draft.used || [], sensitive: draft.sensitive || [], channel: null };
+  store.set('profile', P); step = 0; store.set('step', 0); tab = 'top5'; store.set('tab', tab);
+  show('app'); drawApp();
+}
+
+// ---------- app ----------
+function drawApp() {
+  $('#appBiz').textContent = P.biz;
+  $('#meBtn').textContent = (P.name || '?').slice(0, 1).toUpperCase();
+  const recL = rank(P).some(t => t.local) && !requested.visit;
+  $('#appTabs').innerHTML = TABS.map(([id, l]) => `<button role="tab" aria-selected="${tab === id}" data-tab="${id}">${l}${id === 'local' && recL ? '<i class="rec" title="Recommended for you"></i>' : ''}</button>`).join('');
+  const m = $('#appMain');
+  if (tab === 'top5') m.innerHTML = renderTop5(P, { progress });
+  else if (tab === 'news') m.innerHTML = renderNews(P, newsFilter);
+  else if (tab === 'local') m.innerHTML = renderLocal(P, { requested: requested.visit });
+  else drawChat();
+}
+$('#appTabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (!b) return; tab = b.dataset.tab; store.set('tab', tab); drawApp(); scrollTo(0, 0); });
+$('#appMain').addEventListener('click', e => {
+  const t = e.target.closest('[data-tool]'); if (t) return openTool(t.dataset.tool);
+  const nf = e.target.closest('[data-nf]'); if (nf) { newsFilter = nf.dataset.nf; drawApp(); return; }
+  if (e.target.closest('[data-visit]')) { requested.visit = true; store.set('requested', requested); drawApp(); return; }
+  const sg = e.target.closest('[data-sug]'); if (sg) { ask(sg.dataset.sug); return; }
+  const ch = e.target.closest('[data-chan]'); if (ch) { P.channel = ch.dataset.chan; store.set('profile', P); drawChat(); return; }
+});
+// account menu
+$('#meBtn').addEventListener('click', e => {
+  e.stopPropagation(); const m = $('#menu'), open = m.hidden;
+  m.innerHTML = `<div class="who"><b>${esc(P.name)}</b><span>${esc(P.biz)} · ${esc(labelOf(INDUSTRIES, P.industry))}</span></div>
+    <button data-m="redo">${ic('reset')}Redo onboarding</button><button data-m="site">${ic('web')}Back to the website</button>`;
+  m.hidden = !open; $('#meBtn').setAttribute('aria-expanded', String(open));
+});
+$('#menu').addEventListener('click', e => {
+  const b = e.target.closest('[data-m]'); if (!b) return; $('#menu').hidden = true;
+  if (b.dataset.m === 'redo') { draft = { name: P.name, biz: P.biz, industry: P.industry, size: P.size, pains: P.pains, used: P.used, sensitive: P.sensitive }; P = null; store.del('profile'); turns = []; store.set('turns', turns); step = 1; saveDraft(); route(); }
+  else { history.pushState('', '', location.pathname + location.search); route(); scrollTo(0, 0); }
+});
+document.addEventListener('click', e => { if (!e.target.closest('#menu') && !e.target.closest('#meBtn')) $('#menu').hidden = true; });
+
+// tool sheet
+function openTool(id) {
+  const top = rank(P), i = top.findIndex(t => t.id === id), t = top[i]; if (!t) return;
+  const steps = stepsOf(t, P), done = progress[id] || [];
+  const pct = Math.round(done.length / steps.length * 100);
+  $('#sheetRoot').innerHTML = `<div class="sheet-back" data-close></div><aside class="sheet" role="dialog" aria-modal="true" aria-label="${esc(t.name)}">
+    <div class="x"><span class="eyebrow">#${i + 1} in your top 5</span><button class="close" data-close aria-label="Close">${ic('x')}</button></div>
+    <h3>${esc(t.name)}</h3><p class="what">${esc(t.what)}</p>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">${tagFor(t)}<span class="tag">~${t.h} h saved / week</span></div>
+    <div class="box ${t.local ? 'local' : ''}"><h4>Why it's in your top 5</h4><p>${esc(t.why)}</p>${t.local ? `<p style="margin-top:10px">Runs on a private AI server in your office. <button class="mono" style="color:var(--local);text-decoration:underline" data-golocal>How that works</button></p>` : ''}</div>
+    <div class="box"><h4>Set it up<span>${done.length} of ${steps.length} done</span></h4><div class="bar"><span style="width:${pct}%"></span></div>
+      <div style="margin-top:6px">${steps.map((s, k) => `<button class="chk ${done.includes(k) ? 'on' : ''}" data-step="${k}"><i>${ic('check')}</i><span>${esc(s)}</span></button>`).join('')}</div></div>
+    <div class="acts"><button class="btn ghost" data-askabout="${t.id}">${ic('chat')}Ask in chat</button>${requested[t.id] ? '' : `<button class="btn" data-hire="${t.id}">Have us set it up</button>`}</div>
+    ${requested[t.id] ? `<div class="sent">${ic('check')}<div>Setup requested. We'll contact you to book it.<small>Preview: nothing is sent yet.</small></div></div>` : ''}
+  </aside>`;
+  const sh = $('.sheet'); sh.focus?.();
+  sh.addEventListener('click', e => {
+    const st = e.target.closest('[data-step]');
+    if (st) { const k = +st.dataset.step; const d = new Set(progress[id] || []); d.has(k) ? d.delete(k) : d.add(k); progress[id] = [...d]; store.set('progress', progress); openTool(id); if (tab === 'top5') drawApp(); return; }
+    if (e.target.closest('[data-hire]')) { requested[id] = true; store.set('requested', requested); openTool(id); return; }
+    if (e.target.closest('[data-golocal]')) { closeSheet(); tab = 'local'; store.set('tab', tab); drawApp(); return; }
+    const a = e.target.closest('[data-askabout]'); if (a) { closeSheet(); tab = 'chat'; store.set('tab', tab); drawApp(); ask(`How do I set up the ${t.name.toLowerCase()} for ${P.biz}?`); }
+  });
+}
+function closeSheet() { $('#sheetRoot').innerHTML = ''; }
+$('#sheetRoot').addEventListener('click', e => { if (e.target.closest('[data-close]')) closeSheet(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#sheetRoot').innerHTML) closeSheet(); });
+
+// ---------- chat ----------
+let sample = null, busy = false, ctl = null;
+(async () => { try { if (window.claude && window.claude.use) sample = await window.claude.use('sample'); } catch (e) { sample = null; } if (!$('#app').hidden && tab === 'chat') drawChat(); })();
+function md(text) {
+  const lines = esc(text).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').split('\n');
+  let html = '', list = null;
+  const close = () => { if (list) { html += `</${list}>`; list = null; } };
+  for (const raw of lines) {
+    const l = raw.trim();
+    const ol = l.match(/^\d+[.)]\s+(.*)/), ul = l.match(/^[-*•]\s+(.*)/);
+    if (ol || ul) { const k = ol ? 'ol' : 'ul'; if (list !== k) { close(); html += `<${k}>`; list = k; } html += `<li>${(ol || ul)[1]}</li>`; }
+    else if (!l) close();
+    else { close(); html += `<p>${l.replace(/^#+\s*/, '')}</p>`; }
+  }
+  close(); return html;
+}
+function drawChat() {
+  if ($('#app').hidden || tab !== 'chat') return;
+  const m = $('#appMain');
+  const draftText = $('#chatIn')?.value || '';
+  const chan = P.channel;
+  const today = chan
+    ? `<div class="today"><span class="eyebrow">Day 2 question</span><div class="tq">How do new clients usually find ${esc(P.biz)}?</div><div class="ok">${ic('check')}Saved: ${esc(chan)}. Tomorrow's question is about how a new client signs.</div></div>`
+    : `<div class="today"><span class="eyebrow">Day 2 question</span><div class="tq">How do new clients usually find ${esc(P.biz)}?</div><div class="opts">${['Referrals', 'Google search', 'Social media', 'Ads', 'Walk-ins'].map(o => `<button class="opt" data-chan="${o}">${o}</button>`).join('')}</div></div>`;
+  const sugs = ['Which tool should I start with?', 'How does the private server work?', 'Write a note to my team about our new tools'];
+  m.innerHTML = `<div class="chat"><div class="stream wrap" id="stream">
+    ${turns.length ? '' : chatGreeting(P) + today + `<div class="sugs">${sugs.map(s => `<button class="sug" data-sug="${esc(s)}">${esc(s)}</button>`).join('')}</div>`}
+    ${turns.map(msgHTML).join('')}
+    </div>
+    <div class="composer"><div class="wrap" style="max-width:none"><div class="box"><textarea id="chatIn" rows="1" placeholder="Ask about your tools, your setup, anything…" aria-label="Message"></textarea><button class="send" id="sendBtn" aria-label="Send" disabled>${ic('send')}</button></div>
+    <p class="hint">${sample ? 'Answers come from Claude, using what you told it about your business.' : 'Preview answers. Open this page in Claude to chat for real.'}</p></div></div></div>`;
+  const ta = $('#chatIn'), sb = $('#sendBtn');
+  ta.value = draftText;
+  const fit = () => { ta.style.height = 'auto'; ta.style.height = Math.min(160, ta.scrollHeight) + 'px'; sb.disabled = !ta.value.trim() || busy; };
+  ta.addEventListener('input', fit); fit();
+  ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (ta.value.trim() && !busy) { const v = ta.value; ta.value = ''; ask(v); } } });
+  sb.addEventListener('click', () => { if (ta.value.trim() && !busy) { const v = ta.value; ta.value = ''; ask(v); } });
+  if (turns.length) scrollTo(0, document.body.scrollHeight);
+}
+function msgHTML(t) {
+  if (t.role === 'user') return `<div class="msg me"><div class="bub">${esc(t.content)}</div></div>`;
+  return `<div class="msg ai"><span class="av">${MARK}</span><div style="min-width:0"><div class="txt">${t.pending ? '<span class="thinking"><i></i><i></i><i></i></span>' : md(t.content)}</div>${t.fallback ? '<div class="meta">Preview answer</div>' : ''}${t.err ? `<div class="meta">${esc(t.err)}</div>` : ''}</div></div>`;
+}
+function rules() {
+  const top = rank(P);
+  return `You are the assistant inside "AI Department", an app that acts as a small business's AI department. You are talking to the owner.
+The business:
+- Owner: ${P.name}
+- Business: ${P.biz} (${labelOf(INDUSTRIES, P.industry)}), team: ${labelOf(SIZES, P.size)}
+- Where the team loses time: ${(P.pains || []).map(p => labelOf(PAINS, p)).join(', ') || 'not given'}
+- Tools they already use: ${(P.used || []).join(', ') || 'not given'}
+- Sensitive data they handle: ${(P.sensitive || []).filter(s => s !== 'none').map(s => labelOf(SENS, s)).join(', ') || 'none'}
+- How new clients find them: ${P.channel || 'not asked yet'}
+Their current top 5 AI tools to implement, ranked:
+${top.map((t, i) => `${i + 1}. ${t.name} (${t.local ? 'runs locally on a private server' : 'cloud'}, about ${t.h} h/week saved): ${t.what} Setup: ${stepsOf(t, P).join('; ')}.`).join('\n')}
+The local service: tools that touch sensitive data run on a private AI server our team installs in their office. They own the hardware, the data never leaves the building, and a monthly plan covers updates, new models and support. Prices are quoted after a short call: never invent prices.
+How to answer: plain language, short (under 150 words unless they ask for more), no jargon, no headings. Use numbered steps for anything they need to do. Name specific products only when asked, and tell them to check current pricing. If they'd rather not do a setup themselves, point them to the "Have us set it up" button on that tool in the Top 5 tab. Never claim you did something outside this chat.`;
+}
+function fallback(q) {
+  const top = rank(P), s = q.toLowerCase();
+  const t = top.find(x => s.includes(x.name.toLowerCase().split(' ')[0])) || null;
+  if (/server|local|office|private/.test(s)) {
+    const loc = top.filter(x => x.local);
+    return `${loc.length ? `**${loc.map(x => x.name).join('** and **')}** should run on a private AI server in your office, because ${loc.length > 1 ? 'they touch' : 'it touches'} sensitive data.` : 'Nothing in your top 5 needs a private server right now.'}\n\nHow it works:\n1. We visit and install the server.\n2. We connect the folders it is allowed to read.\n3. You own the hardware, and your data never leaves the building.\n4. A monthly plan covers updates, new models and support.\n\nYou can book the visit from the Local tab.`;
+  }
+  if (/team|note|announce/.test(s)) return `Here's a short note you can send:\n\nHi all, we're starting to use a few AI tools to take routine work off your plates, starting with **${top[0].name.toLowerCase()}**. Nothing changes in how you work this week. I'll show you how it works on Friday, and you can tell me what you'd like it to do next.\n\n${P.name}`;
+  if (t || /set ?up|how do i|install/.test(s)) {
+    const x = t || top[0];
+    return `To set up the **${x.name.toLowerCase()}**:\n${stepsOf(x, P).map((st, i) => `${i + 1}. ${st}.`).join('\n')}\n\nYou can tick these off in the Top 5 tab, or press "Have us set it up" and we'll do it with you.`;
+  }
+  return `Start with the **${top[0].name.toLowerCase()}**. ${top[0].why} It should save about ${top[0].h} hours a week.\n\n1. ${stepsOf(top[0], P)[0]}.\n2. ${stepsOf(top[0], P)[1]}.\n\nAfter that, ${top[1].name.toLowerCase()} is next on your list.`;
+}
+async function ask(q) {
+  q = String(q || '').trim(); if (!q || busy) return;
+  if (tab !== 'chat') { tab = 'chat'; store.set('tab', tab); drawApp(); }
+  turns.push({ role: 'user', content: q });
+  const a = { role: 'assistant', content: '', pending: true }; turns.push(a);
+  busy = true; drawChat();
+  const node = () => $$('#stream .msg.ai').pop()?.querySelector('.txt');
+  if (sample) {
+    ctl = new AbortController();
+    const hist = turns.filter(t => !t.pending && t.content).slice(-12).map(t => ({ role: t.role, content: t.content }));
+    while (hist.length && hist[0].role !== 'user') hist.shift();
+    try {
+      const { text } = await sample([{ role: 'user', content: rules() }, ...hist], { cache: false, modelTier: 'quick', signal: ctl.signal,
+        onText: ({ text }) => { a.pending = false; a.content = text; const n = node(); if (n) n.innerHTML = md(text); } });
+      a.content = text; a.pending = false;
+    } catch (e) {
+      a.pending = false;
+      if (e && e.text) a.content = e.text;
+      if (e && ['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed'].includes(e.code)) { sample = null; a.content = fallback(q); a.fallback = true; }
+      else if (!a.content) { a.content = fallback(q); a.fallback = true; a.err = e && e.code === 'rate_limited' ? 'Claude is busy. Try again in a minute.' : ''; }
+    }
+  } else {
+    await new Promise(r => setTimeout(r, 650));
+    a.pending = false; a.content = fallback(q); a.fallback = true;
+  }
+  busy = false; store.set('turns', turns.filter(t => !t.pending).slice(-30)); drawChat();
+}
+
+route();
+})();
+</script>

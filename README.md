@@ -56,9 +56,21 @@ Two parts, combined into one business:
 4. **Go signal:** at least 3 of 10 are ready to pay for a setup.
 5. Only then build the diagnostic as software.
 
+## Website preview
+
+`site/index.html` is the whole site in one file:
+- the landing page: how it works, the local service, pricing;
+- a clickable app preview: onboarding, then the Chat, Top 5, News and Local tabs.
+
+The Top 5 is ranked in the page from the onboarding answers. The chat uses Claude when the page is opened as a Claude artifact. Anywhere else it falls back to scripted answers. The news items are sample stories. Nothing a visitor types is sent anywhere.
+
+- **Preview locally:** run `python3 site/dev_server.py`, then open http://localhost:4173. Add `#app` to the URL to open the app.
+- **Published version:** Jerome's Claude artifact, which is private until he shares it.
+
 ## Repo layout
 
 - `README.md`: the current concept. Keep it up to date as decisions are made.
+- `site/`: the landing page and app preview (see above).
 - `CLAUDE.md`: context and working rules for Claude Code.
 - `docs/origin-conversation.md`: the conversation the idea came from.
 - `docs/decisions.md`: a log of decisions made.
