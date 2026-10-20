@@ -59,10 +59,14 @@ Two parts, combined into one business:
 ## Website preview
 
 `site/index.html` is the whole site in one file:
-- the landing page: how it works, the local service, pricing;
-- a clickable app preview: onboarding, then the Chat, Top 5, News and Local tabs.
+- the landing page: how it works, a tour, local servers, pricing;
+- a clickable app preview built around **Otto**, the agent. After onboarding there are four tabs:
+  - **Today:** Otto's daily question, what changed in your top 5, stories for you, and a message box to talk to him.
+  - **Top 5:** real tools (Dext, Copilot, Fathom, ElevenLabs and so on), re-ranked as Otto learns, with moves and update times.
+  - **News:** a magazine-style briefing with an article reader.
+  - **Local servers:** which tools run on a private server in the office.
 
-The Top 5 is ranked in the page from the onboarding answers. The chat uses Claude when the page is opened as a Claude artifact. Anywhere else it falls back to scripted answers. The news items are sample stories. Nothing a visitor types is sent anywhere.
+The ranking runs in the page from the onboarding and daily answers, over 28 real tools, 4 of them self-hosted. Otto answers with Claude when the page is opened as a Claude artifact. Anywhere else he falls back to scripted answers. News stories and time-saved figures are illustrative. Nothing a visitor types is sent anywhere.
 
 - **Preview locally:** run `python3 site/dev_server.py`, then open http://localhost:4173. Add `#app` to the URL to open the app.
 - **Published version:** Jerome's Claude artifact, which is private until he shares it.
